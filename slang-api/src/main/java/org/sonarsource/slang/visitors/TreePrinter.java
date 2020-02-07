@@ -34,6 +34,7 @@ import org.sonarsource.slang.api.Tree;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 public class TreePrinter {
 
@@ -93,14 +94,19 @@ public class TreePrinter {
     if (tokens.isEmpty()) {
       return "";
     } else {
-      String firstToken = escapeWhiteSpace(tokens.get(0).text());
-      String lastToken = escapeWhiteSpace(tokens.get(tokens.size() - 1).text());
-      if (tokens.size() == 1) {
-        return truncate(firstToken, 23);
-      } else {
-        return truncateFromLeft(firstToken, 10) +
-            " … " + truncateFromRight(lastToken, 10);
-      }
+      String text = tokens.stream()
+              .map(Token::text)
+              .map(TreePrinter::escapeWhiteSpace)
+              .collect(Collectors.joining(" "));
+      return text.substring(0, 1) + text.substring(1).replaceFirst("\\{.*\\}", "{ … }");
+//      String firstToken = escapeWhiteSpace(tokens.get(0).text());
+//      String lastToken = escapeWhiteSpace(tokens.get(tokens.size() - 1).text());
+//      if (tokens.size() == 1) {
+//        return truncate(firstToken, 23);
+//      } else {
+//        return truncateFromLeft(firstToken, 10) +
+//            " … " + truncateFromRight(lastToken, 10);
+//      }
     }
   }
 
